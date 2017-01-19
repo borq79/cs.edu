@@ -117,7 +117,7 @@ void WeatherStation::loadConfigurationFile() {
       //  Serial.println(String("Val = " + val));
 
       // Skip comments
-      if (key.startsWith("//")) {
+      if (key.startsWith("#")) {
         continue;
       }
 

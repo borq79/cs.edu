@@ -13,7 +13,7 @@
 #include "WeatherStation.h"
 
 #define COMM_BAUD_RATE 115200
-#define CONFIG_FILE_PATH "/weather.config"
+#define CONFIG_FILE_PATH "/weather.ini"
 
 WeatherStation weatherStation(CONFIG_FILE_PATH);
 SimpleTimer timer;

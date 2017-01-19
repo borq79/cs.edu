@@ -27,7 +27,7 @@
 #define TS_FIELD_HUMIDITY        2
 #define TS_FIELD_PRESSURE        3
 #define TS_FIELD_BRIGHTNESS      4
-#define TS_SEND_RATE             15000
+#define TS_SEND_RATE             60000
 
 #define BLYNK_VF_TEMP            1
 #define BLYNK_VF_HUMIDITY        2

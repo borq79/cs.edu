@@ -1,5 +1,0 @@
-ssid:SSID_FOR_YOUR_WIFI
-wifipassword:YOUR_WIFI_PASSWORD
-thingspeakapikey:YOUR_THINGSPEAK_API_KEY
-thingspeakchannelid:YOUR_THINGSPEAK_CHANNEL_ID
-blynkapikey:YOUR_BLYNK_API_KEY
