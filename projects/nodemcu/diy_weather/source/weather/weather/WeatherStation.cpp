@@ -150,7 +150,7 @@ void WeatherStation::readSensors() {
     Serial.print("Sensor Values\nT: "); Serial.print(tempF, 2);
     Serial.print("\nH: "); Serial.print(humidity, 2);
     Serial.print("\nP: "); Serial.print(pressure, 2);
-    Serial.print("\nB: "); Serial.print(brightness, 2);
+    Serial.print("\nB: "); Serial.print(brightness);
     Serial.println("\n");
   }
 
