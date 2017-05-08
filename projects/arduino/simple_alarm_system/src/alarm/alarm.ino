@@ -6,6 +6,8 @@
 // LED Light Strand Pin
 #define LED_PIN      2
 
+#define MAX_ALARM_TIME 10000
+
 #define TRIGGER_PIN  6  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     7  // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters).
@@ -13,6 +15,7 @@
 #define ALARM 3
 float sinVal;
 int toneVal;
+int alarmDuration = 0;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(10, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -31,10 +34,15 @@ void setup(){
 
 
 void loop(){
-  if(triggered == true) {
+  Serial.print("Alarm delay: "); Serial.println(alarmDuration);
+  if(triggered == true && alarmDuration < MAX_ALARM_TIME) {
+    alarmDuration += 250;
     alarm();
-  }
-  else{
+  } else if(triggered == true) {
+    alarmDuration = 0;
+    triggered = false;
+    alarmOff();
+  } else if (triggered == false) {
     delay(50);            // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
     unsigned int uS = sonar.ping();             // Send ping, get ping time in microseconds (uS).
     unsigned int distance = uS / US_ROUNDTRIP_CM;
@@ -42,7 +50,7 @@ void loop(){
     if(distance < 50) {
       triggered = true;
     }
-  }
+  } 
 }
 
 void alarm(){
@@ -58,6 +66,11 @@ void alarm(){
     toneVal = 2000+(int(sinVal*1000));
     NewTone(ALARM, toneVal);
   }
+}
+
+void alarmOff() {
+  color(0, 0, 0);
+  NewTone(ALARM, 0);
 }
 
 //helper function enabling us to send a colour in one command
