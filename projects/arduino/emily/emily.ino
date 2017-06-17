@@ -29,14 +29,13 @@
  * Copyright © 2017 Waren Gonzaga
  */
 
-// Updated to work with KWM-30881CVB by Ryan Brock
-
 #include <Arduino.h>
+
 
 // Part # KWM-30881CVB
 // KWM Column: 1   2   3   4   5   6   7   8
 // KWM Pin:    13  3   4   10  6   11  15  16
-// Nano Pin:   A5  D7  D6  D4  D5  A3  A6  A7
+// Nano Pin:   A5  D7  D6  A2  D5  A3  D12 D13
 
 // KWM Row:    1   2   3   4   5   6   7   8
 // KWM Pin:    9   14  8   12  1   7   2   5
@@ -45,12 +44,12 @@
 
 // 2-dimensional array of column pin numbers:
 const int col[8] = {
-  A5, D7, D6, D4, D5, A3, A6, A7
+  A5, 7, 6, A2, 5, A3, 12, 13
 };
 
 // 2-dimensional array of row pin numbers:
 const int row[8] = {
-  D4, D2, A1, D3, D9, A0, D8, D10
+  4, 2, A1, 3, 9, A0, 8, 10
 };
 
 
@@ -226,6 +225,23 @@ void loop() {
 
 }
 
+void debugAllOn() {
+  for(int i = 0; i < 8; i++ ) {
+    digitalWrite(col[i], LOW);
+    for(int j = 0; j < 8; j++) {
+      digitalWrite(row[i], LOW);
+    }
+  }
+
+  for(int i = 0; i < 8; i++ ) {
+    digitalWrite(col[i], HIGH);
+    for(int j = 0; j < 8; j++) {
+      digitalWrite(row[i], LOW);
+    }
+  }
+  delay(15000);
+}
+
 void setupChar(){
   char c = str[ptrChar];
   int offset = c - 'A';
@@ -237,9 +253,9 @@ void setupChar(){
       bool v = (*cMap)[x][y];
 
       if(v){
-        pixels[x][y] = LOW;
-      }else{
         pixels[x][y] = HIGH;
+      }else{
+        pixels[x][y] = LOW;
       }
     }
   }
@@ -263,8 +279,8 @@ void refreshScreen() {
       // when the row is LOW and the column is HIGH,
       // the LED where they meet turns on:
       digitalWrite(col[thisCol], thisPixel);
-      // turn the pixel off:
-      if (thisPixel == LOW) {
+      // turn the pixel on:
+      if (thisPixel == HIGH) {
         digitalWrite(col[thisCol], LOW);
       }
     }
