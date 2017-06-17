@@ -29,8 +29,9 @@
  * Copyright © 2017 Waren Gonzaga
  */
 
-#include <Arduino.h>
+// Updated to work with KWM-30881CVB by Ryan Brock
 
+#include <Arduino.h>
 
 // Part # KWM-30881CVB
 // KWM Column: 1   2   3   4   5   6   7   8
@@ -44,12 +45,12 @@
 
 // 2-dimensional array of column pin numbers:
 const int col[8] = {
-  A5, 7, 6, 4, 5, A3, A6, A7
+  A5, D7, D6, D4, D5, A3, A6, A7
 };
 
 // 2-dimensional array of row pin numbers:
 const int row[8] = {
-  4, 2, A1, 3, 9, A0, 8, 10
+  D4, D2, A1, D3, D9, A0, D8, D10
 };
 
 
