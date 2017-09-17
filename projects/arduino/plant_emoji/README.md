@@ -1,6 +1,6 @@
-# Simple Alarm System
+# Plant Emoji
 
-This is an adaptation of the following project: http://www.makeuseof.com/tag/how-to-make-a-simple-arduino-alarm-system/
+This is an adaptation of the following project: http://www.instructables.com/id/Plant-Emoji/
 
 You can find the schematic here:
 
