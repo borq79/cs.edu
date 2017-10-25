@@ -47,18 +47,25 @@ void loop(){
     unsigned int uS = sonar.ping();             // Send ping, get ping time in microseconds (uS).
     unsigned int distance = uS / US_ROUNDTRIP_CM;
     Serial.println(distance);
-    if(distance < 50) {
+    if(distance < 70) {
       triggered = true;
     }
   } 
 }
 
 void alarm(){
-  color(255,0,0);    //red
-  delay(100);
-  color(255,255,0);  //yelow
-  delay(100);
-
+  color(225,0,178);    //red
+  delay(200);
+  color(0,199,225);  //yelow
+  delay(200);
+  color(4,225,0);
+  delay(200);
+  color(109,57,1);
+  delay(400);
+  color(8,0,225);
+  delay(200);
+  color(242,225,0);
+  delay(300);
   for (int x=0; x<180; x++) {
     // convert degrees to radians then obtain sin value
     sinVal = (sin(x*(3.1412/180)));
