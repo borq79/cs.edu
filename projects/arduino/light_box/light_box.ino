@@ -2,13 +2,29 @@
 
 #define PIN 12
 
+#define NUMBER_OF_LEDS 60
+#define MAX_CURRENT_PER_LED  60
+#define MAX_CURRENT_DRAW_STRIP 1800
+static uint32_t POTENTIAL_CURRENT_DRAW = (MAX_CURRENT_PER_LED * NUMBER_OF_LEDS);
+static uint32_t BRIGHTNESS_DIVISOR = ((POTENTIAL_CURRENT_DRAW > MAX_CURRENT_DRAW_STRIP) ? ((POTENTIAL_CURRENT_DRAW * 1000) / MAX_CURRENT_DRAW_STRIP) : 1000);
+static byte MAX_BRIGHTNESS = (255000 / BRIGHTNESS_DIVISOR) & 255;
+
 #define POTENTIOMETER_STEP_DIVISOR 2
-#define DEBOUNCE_TIME 250
+#define RESISTENCE_OFFSET 15
+
+#define KNOB_MAX 1024
+#define KNOB_MIN 0
+static float KNOB_RANGE = KNOB_MAX - KNOB_MIN;
+static uint16_t KNOB_CONVERSION = round(KNOB_RANGE / 255);
+
+#define DEBOUNCE_TIME 500
 
 // Speed Control
 #define KNOB_PWR  11
 #define KNOB_DIAL A0
 // #define KNOB_GND_1  2
+
+#define CHASE_WINDOW 4
 
 // Mode
 // #define BUTTON_SUPPLY 8
@@ -26,17 +42,20 @@
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMBER_OF_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   Serial.begin(9600);
+  Serial.print("Maximum Brightness due to current limitations: "); Serial.println(MAX_BRIGHTNESS);
+
+  randomSeed(analogRead(1));
 
   pinMode(KNOB_PWR,  OUTPUT);
   pinMode(KNOB_DIAL, INPUT);
   digitalWrite(KNOB_PWR, HIGH);
 
   pinMode(BUTTON_SINK, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_SINK), buttonISR, LOW);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_SINK), buttonISR, LOW);
 
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
@@ -80,37 +99,42 @@ void buttonISR() {
 
 void loop() {
 
-  byte knobValue = ((analogRead(KNOB_DIAL) >> POTENTIOMETER_STEP_DIVISOR) & 255);
+  uint16_t rawValue = analogRead(KNOB_DIAL);
+  byte speedValue = (rawValue / KNOB_CONVERSION) & 255;
+  byte brightnessValue = (((KNOB_MAX - rawValue) / KNOB_CONVERSION) & 255);
 
-  Serial.print("Mode: "); Serial.print(lightMode); Serial.print(" Value: "); Serial.println(knobValue);
-  Serial.print("A: "); Serial.println(digitalRead(BUTTON_SINK));
-  Serial.print("B: "); Serial.println(analogRead(KNOB_DIAL));
+  /*Serial.print("Mode: "); Serial.println(lightMode);
+  Serial.print("BUTTON: "); Serial.println(digitalRead(BUTTON_SINK));
+  Serial.print("RAW: "); Serial.println(rawValue);
+  Serial.print("SPEED: "); Serial.println(speedValue);
+  Serial.print("BRIGHTNESS: "); Serial.println(brightnessValue);*/
 //delay(500);
 
 interruptFired = false;
 attachInterrupt(digitalPinToInterrupt(BUTTON_SINK), buttonISR, LOW);
   // Check if the button was pressed and adjust the mode accordingly
   switch(lightMode) {
+    case LIGHT_MODE_WIPE:
+      repeatWipe(speedValue);
+      break;
     case LIGHT_MODE_ALL_RED:
-      setLightsToSingleColor(knobValue, 0x00, 0x00);
+      setLightsToSingleColor(brightnessValue, 0x00, 0x00);
       break;
     case LIGHT_MODE_ALL_GREEN:
-      setLightsToSingleColor(0x00, knobValue, 0x00);
+      setLightsToSingleColor(0x00, brightnessValue, 0x00);
       break;
     case LIGHT_MODE_ALL_BLUE:
-      setLightsToSingleColor(0x00, 0x00, knobValue);
+      setLightsToSingleColor(0x00, 0x00, brightnessValue);
       break;
-    case LIGHT_MODE_WIPE:
-      repeatWipe(knobValue);
+    case LIGHT_MODE_SOLID_RAINBOW:
+      rainbow(speedValue);
+      break;
+    case LIGHT_MODE_CHASE:
+      chase(speedValue);
       break;
     case LIGHT_MODE_FADE:
       break;
-    case LIGHT_MODE_CHASE:
-      break;
     case LIGHT_MODE_PULSE:
-      break;
-    case LIGHT_MODE_SOLID_RAINBOW:
-      rainbow(knobValue / 16);
       break;
     default:
     case LIGHT_MODE_MEDLEY:
@@ -126,7 +150,7 @@ attachInterrupt(digitalPinToInterrupt(BUTTON_SINK), buttonISR, LOW);
 
 void setLightsToSingleColor(byte r, byte g, byte b) {
   for(uint16_t i = 0; i < strip.numPixels(); i++) {
-    strip.setPixelColor(i, r, g, b);
+    strip.setPixelColor(i, r & MAX_BRIGHTNESS, g & MAX_BRIGHTNESS, b & MAX_BRIGHTNESS);
 
     if (interruptFired) { return; }
   }
@@ -134,9 +158,9 @@ void setLightsToSingleColor(byte r, byte g, byte b) {
 }
 
 void repeatWipe(uint8_t wipeSpeed) {
-  colorWipe(strip.Color(255, 0, 0), wipeSpeed); // Red
-  colorWipe(strip.Color(0, 255, 0), wipeSpeed); // Green
-  colorWipe(strip.Color(0, 0, 255), wipeSpeed); // Blue
+  colorWipe(strip.Color(MAX_BRIGHTNESS, 0, 0), wipeSpeed); // Red
+  colorWipe(strip.Color(0, MAX_BRIGHTNESS, 0), wipeSpeed); // Green
+  colorWipe(strip.Color(0, 0, MAX_BRIGHTNESS), wipeSpeed); // Blue
 }
 
 // Fill the dots one after the other with a color
@@ -150,16 +174,64 @@ void colorWipe(uint32_t c, uint8_t wait) {
 }
 
 void rainbow(uint8_t wait) {
+  wait /= 16;
   Serial.print("Rainbow Wait: "); Serial.println(wait);
   uint16_t i, j;
 
   for(j=0; j<256; j++) {
     for(i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel((i+j) & 255, 255));
+      strip.setPixelColor(i, Wheel((i+j) & 255, MAX_BRIGHTNESS));
     }
     strip.show();
     delay(wait);
     if (interruptFired) { return; }
+  }
+}
+
+void chase(uint8_t speed) {
+  uint32_t colorToWipe = Wheel(random(0, 255), MAX_BRIGHTNESS);
+
+  for(int i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, Wheel(i, MAX_BRIGHTNESS));
+  }
+  strip.show();
+
+  int directionModifier = 1;
+
+  for(int j=0; j<256; j++) {
+    colorToWipe = Wheel(random(0, 255), MAX_BRIGHTNESS);
+    Serial.print("COLOR: "); Serial.println(colorToWipe);
+    int pixelStart = directionModifier > 0 ? 0 : strip.numPixels() - 1;
+  //  int pixelStop = directionModifier > 0 ? strip.numPixels() : 0;
+
+    Serial.print("MOD: "); Serial.println(directionModifier);
+    Serial.print("pixelStart: "); Serial.println(pixelStart);
+  //  Serial.print("pixelStop: "); Serial.println(pixelStop);
+
+    for(int i=pixelStart; (i >= 0 && i < strip.numPixels()); i += directionModifier) {
+
+
+      for(int k = 0; k < CHASE_WINDOW; k++) {
+        int currentPixel = i + (k * directionModifier);
+        Serial.print("C: "); Serial.println(currentPixel);
+        if (currentPixel < NUMBER_OF_LEDS && currentPixel > 0) {
+          strip.setPixelColor(i + k, MAX_BRIGHTNESS, MAX_BRIGHTNESS, MAX_BRIGHTNESS);
+        }
+      }
+
+      int previousPixel = i - directionModifier;
+
+      Serial.print("P: "); Serial.println(previousPixel);
+      if (previousPixel < NUMBER_OF_LEDS && previousPixel > 0) {
+        strip.setPixelColor(previousPixel, colorToWipe);
+      }
+
+      strip.show();
+      delay(speed);
+      if (interruptFired) { return; }
+    }
+
+    directionModifier *= -1;
   }
 }
 
