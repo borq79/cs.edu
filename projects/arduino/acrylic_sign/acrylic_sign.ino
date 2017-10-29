@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 13
+#define PIN 3
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
