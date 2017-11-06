@@ -75,7 +75,8 @@ void setup()
   pinMode(0, OUTPUT);
 
   soilhumid = 0;
-  humid = 0;
+  humid = 300
+  ;
 }
 
 void loop()
@@ -86,12 +87,12 @@ void loop()
   Serial.println(soilhumid);
 
   // lack water
-  if (soilhumid < humid) {
+  if (soilhumid > humid) {
 
     // sad face
     maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,60); maxSingle(6,66); maxSingle(7,66); maxSingle(8,0);// buzzer on
     digitalWrite(0,HIGH);
-    delay(3000);
+//    delay(3000);
 
     // buzzer off
     digitalWrite(0,LOW);
@@ -101,4 +102,5 @@ void loop()
     maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,126); maxSingle(6,66); maxSingle(7,36); maxSingle(8,24);// buzzer off
     digitalWrite(0,LOW);
   }
+    delay(1000);
 }
