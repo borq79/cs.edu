@@ -253,12 +253,6 @@ void setLightsToSingleColor(byte r, byte g, byte b) {
   strip.show();
 }
 
-/*void repeatWipe(uint8_t wipeSpeed) {
-  colorWipe(strip.Color(0xFF, 0, 0), wipeSpeed); // Red
-  colorWipe(strip.Color(0, 0xFF, 0), wipeSpeed); // Green
-  colorWipe(strip.Color(0, 0, 0xFF), wipeSpeed); // Blue
-}*/
-
 // Fill the dots one after the other with a color
 void colorWipe(uint8_t wait) {
   COLOR color = getNextColor();
@@ -272,35 +266,16 @@ void colorWipe(uint8_t wait) {
 }
 
 void rainbow(uint8_t speed, uint8_t brightness) {
+  COLOR color = getNextColor();
 
-
-//  for(j=0; j<256; j++) {
-    COLOR color = getNextColor();
-
-    for(uint16_t i = 0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, color.r, color.b, color.g);
-    }
-    strip.show();
-    delay(speed * 4);
-    //if (shouldInterruptRoutine()) { return; }
-//  }
+  for(uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color.r, color.b, color.g);
+  }
+  strip.show();
+  delay(speed * 4);
 }
 
 void chase(uint8_t speed) {
-  // Initialize the array to all one color
-  //COLOR color = getNextColor();
-/*  for(uint16_t i=0; i<strip.numPixels(); i++) {
-    strip.setPixelColor(i, color.r, color.g, color.b);
-  }
-  strip.show();*/
-
-
-
-
-  // for(uint16_t  = 0; j < 256; j++) {
-  //  colorIndex++;
-    //if (colorIndex >= NUM_COLORS) { colorIndex = 0; }
-
     COLOR color = getNextColor();
 
     int pixelStart = directionModifier > 0 ? 0 : strip.numPixels() - 1;
@@ -331,5 +306,4 @@ void chase(uint8_t speed) {
     }
 
     directionModifier *= -1;
-  //}
 }
