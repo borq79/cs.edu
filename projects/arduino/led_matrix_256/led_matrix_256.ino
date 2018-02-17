@@ -113,16 +113,23 @@ void loop() {
     delay(200);
 }
 
-void renderFrame( uint8_t frameNumber ) {
+void renderFrame( uint16_t frameNumber ) {
+
   // Ensure that there is a valid frame, otherwise we will walk off the memory allocated and then bad things happen
   if (frameNumber >= 0 && frameNumber < MAX_FRAME) {
-
-    COLOR pixel = {0, 0, 0};
+    static COLOR pixel = {0, 0, 0};
     
     // Setup every pixels
-    for(uint8_t i = 0; i < strip.numPixels(); i++) {
-        pixel = frames[frameNumber][i];
-        strip.setPixelColor(i, pixel.red, pixel.green, pixel.blue);
+    for(uint16_t i = 0; i < NUM_OF_PIXELS; i++) {
+
+      // Copy from the program memory to the local variable pixel
+      memcpy_P ((void *)&pixel, &frames[frameNumber][i], sizeof(COLOR));
+      /*  Serial.print("Pixel: "); Serial.println(i);
+        Serial.print("R: "); Serial.println(pixel.red);
+        Serial.print("G: "); Serial.println(pixel.green);
+        Serial.print("B: "); Serial.println(pixel.blue);
+        delay(1000);*/
+      strip.setPixelColor(i, pixel.red, pixel.green, pixel.blue);
     }
 
     // Render the frame
@@ -130,8 +137,8 @@ void renderFrame( uint8_t frameNumber ) {
   }
 }
 
-uint8_t myRemoteRead() {
-    uint8_t remoteFrame = MAX_FRAME; // Start off with an invalid frame to ease debugging
+uint16_t myRemoteRead() {
+    uint16_t remoteFrame = MAX_FRAME; // Start off with an invalid frame to ease debugging
     uint32_t remoteValue = 0;
     
     if (irrecv.decode(&results))  {  // have we received an IR signal?
