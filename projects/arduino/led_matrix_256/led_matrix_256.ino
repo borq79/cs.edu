@@ -89,15 +89,13 @@ const uint16_t MAX_FRAME = sizeof(frames) / NUM_OF_PIXELS;
 void setup() {
     irrecv.enableIRIn(); // Start the remote control receiver
 
-    Serial.begin(9600); // setup serial printing so you can troubleshoot
+    Serial.begin(115200); // setup serial printing so you can troubleshoot
     
     strip.begin();
     strip.setBrightness(1);
     strip.show(); // Initialize all pixels to 'off'
 
-
     Serial.print("Total number of frames: "); Serial.println(MAX_FRAME + 1);
-
 }
 
 void loop() {
