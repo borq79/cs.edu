@@ -16,72 +16,79 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_OF_PIXELS, MATRIX_DATA_PIN, NEO_
 //int sensorPin = A5;    // select the input pin for the potentiometer
 //int sensorValue = 0;  // variable to store the value coming from the sensor
 
-const uint8_t d = 0;
-const uint8_t b = pow(2,7);
-const uint8_t g = pow(2,15);
-const uint8_t r = pow(2,23);
-const uint8_t p = b+r;
-const uint8_t y = g+r;
-const uint8_t a = b+g;
-const uint8_t w = b+g+r;
+struct COLOR {
+  byte r;
+  byte g;
+  byte b;
+};
 
-const PROGMEM uint8_t frames[][NUM_OF_PIXELS] = { {
-        d,d,w,w,d,d,d,d,d,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,d,d,d,d,w,d,w,d,d,
-        d,d,d,w,d,w,d,d,d,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,d,d,w,d,d,d,d,d,d,
-        d,d,d,d,d,d,w,w,w,w,w,d,d,d,d,d,
-        d,d,d,d,d,w,w,w,w,w,d,d,d,d,d,d,
-        d,d,d,d,d,r,r,r,g,r,r,r,d,d,d,d,
-        d,d,d,r,r,r,r,g,r,r,r,r,d,d,d,d,
-        d,d,d,r,r,r,r,g,g,g,r,r,r,r,d,d,
-        d,d,r,r,r,r,g,g,g,r,r,r,r,d,d,d,
-        d,d,d,r,r,r,g,g,g,g,g,r,r,r,d,d,
-        d,d,r,r,g,g,g,g,g,g,g,r,r,d,d,d,
-        d,d,d,r,g,g,g,g,g,g,g,g,g,r,d,d,
-        d,d,d,r,r,r,r,y,r,r,r,r,d,d,d,d,
-        d,d,d,d,d,r,r,r,y,r,r,r,d,d,d,d,
-        d,d,d,d,d,r,r,y,r,r,d,d,d,d,d,d
+#define D {0x00, 0x00, 0x00}
+#define B {0x00, 0x00, 0xFF}
+#define G {0x00, 0xFF, 0x00}
+#define R {0xFF, 0x00, 0x00}
+#define P {0xFF, 0x00, 0xFF}
+#define Y {0xFF, 0xFF, 0x00}
+#define A {0x00, 0xFF, 0xFF}
+#define W {0xFF, 0xFF, 0xFF}
+
+
+const PROGMEM COLOR frames[][NUM_OF_PIXELS] = { {
+        D,D,W,W,D,D,D,D,D,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,D,D,D,D,W,D,W,D,D,
+        D,D,D,W,D,W,D,D,D,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,D,D,W,D,D,D,D,D,D,
+        D,D,D,D,D,D,W,W,W,W,W,D,D,D,D,D,
+        D,D,D,D,D,W,W,W,W,W,D,D,D,D,D,D,
+        D,D,D,D,D,R,R,R,G,R,R,R,D,D,D,D,
+        D,D,D,R,R,R,R,G,R,R,R,R,D,D,D,D,
+        D,D,D,R,R,R,R,G,G,G,R,R,R,R,D,D,
+        D,D,R,R,R,R,G,G,G,R,R,R,R,D,D,D,
+        D,D,D,R,R,R,G,G,G,G,G,R,R,R,D,D,
+        D,D,R,R,G,G,G,G,G,G,G,R,R,D,D,D,
+        D,D,D,R,G,G,G,G,G,G,G,G,G,R,D,D,
+        D,D,D,R,R,R,R,Y,R,R,R,R,D,D,D,D,
+        D,D,D,D,D,R,R,R,Y,R,R,R,D,D,D,D,
+        D,D,D,D,D,R,R,Y,R,R,D,D,D,D,D,D
     },
 
-    {   d,d,d,d,d,d,d,d,r,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,r,d,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,r,w,r,d,d,d,d,d,d,
-        d,d,d,d,d,r,r,w,r,r,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,r,r,r,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,y,d,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,d,y,d,d,d,d,d,d,d,
-        d,d,d,d,w,w,w,w,w,w,w,d,d,d,d,d,
-        d,d,d,d,d,w,w,w,w,w,w,w,d,d,d,d,
-        d,d,d,d,w,w,w,w,w,w,w,d,d,d,d,d,
-        d,d,d,d,d,w,w,w,w,w,w,w,d,d,y,d,
-        y,d,y,d,w,w,w,w,w,w,w,d,d,d,d,d,
-        y,y,y,d,d,w,w,w,w,w,w,w,d,d,y,d,
-        d,y,y,y,w,w,w,w,w,w,w,y,y,y,y,d,
-        d,d,d,y,y,y,y,y,y,y,y,y,y,y,d,d,
-        d,d,d,y,y,y,y,y,y,y,y,y,d,d,d,d
+    {   D,D,D,D,D,D,D,D,R,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,R,D,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,R,W,R,D,D,D,D,D,D,
+        D,D,D,D,D,R,R,W,R,R,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,R,R,R,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,Y,D,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,D,Y,D,D,D,D,D,D,D,
+        D,D,D,D,W,W,W,W,W,W,W,D,D,D,D,D,
+        D,D,D,D,D,W,W,W,W,W,W,W,D,D,D,D,
+        D,D,D,D,W,W,W,W,W,W,W,D,D,D,D,D,
+        D,D,D,D,D,W,W,W,W,W,W,W,D,D,Y,D,
+        Y,D,Y,D,W,W,W,W,W,W,W,D,D,D,D,D,
+        Y,Y,Y,D,D,W,W,W,W,W,W,W,D,D,Y,D,
+        D,Y,Y,Y,W,W,W,W,W,W,W,Y,Y,Y,Y,D,
+        D,D,D,Y,Y,Y,Y,Y,Y,Y,Y,Y,Y,Y,D,D,
+        D,D,D,Y,Y,Y,Y,Y,Y,Y,Y,Y,D,D,D,D
     },
 
-    {   d,d,d,d,d,d,d,g,g,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,d,g,g,d,d,d,d,d,d,d,
-        d,d,d,d,d,d,b,g,g,g,d,d,d,d,d,d,
-        d,d,d,d,d,d,g,g,b,r,d,d,d,d,d,d,
-        d,d,d,d,d,g,g,g,b,g,b,d,d,d,d,d,
-        d,d,d,d,d,g,b,g,g,g,b,d,d,d,d,d,
-        d,d,d,d,g,g,b,g,g,g,b,b,d,d,d,d,
-        d,d,d,d,g,r,g,b,b,g,g,g,d,d,d,d,
-        d,d,d,g,b,g,g,g,g,b,b,g,g,d,d,d,
-        d,d,d,g,b,p,g,g,g,b,b,g,g,d,d,d,
-        d,d,b,g,p,g,g,b,g,g,g,g,b,b,d,d,
-        d,d,g,g,y,g,b,b,g,r,g,b,b,g,d,d,
-        d,g,g,g,g,b,b,g,g,g,b,b,g,g,g,d,
-        d,d,d,d,d,d,y,y,y,y,d,d,d,d,d,d,
-        d,d,d,d,d,d,y,y,y,y,d,d,d,d,d,d,
-        d,d,d,d,d,d,y,y,y,y,d,d,d,d,d,d
+    {   D,D,D,D,D,D,D,G,G,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,D,G,G,D,D,D,D,D,D,D,
+        D,D,D,D,D,D,B,G,G,G,D,D,D,D,D,D,
+        D,D,D,D,D,D,G,G,B,R,D,D,D,D,D,D,
+        D,D,D,D,D,G,G,G,B,G,B,D,D,D,D,D,
+        D,D,D,D,D,G,B,G,G,G,B,D,D,D,D,D,
+        D,D,D,D,G,G,B,G,G,G,B,B,D,D,D,D,
+        D,D,D,D,G,R,G,B,B,G,G,G,D,D,D,D,
+        D,D,D,G,B,G,G,G,G,B,B,G,G,D,D,D,
+        D,D,D,G,B,P,G,G,G,B,B,G,G,D,D,D,
+        D,D,B,G,P,G,G,B,G,G,G,G,B,B,D,D,
+        D,D,G,G,Y,G,B,B,G,R,G,B,B,G,D,D,
+        D,G,G,G,G,B,B,G,G,G,B,B,G,G,G,D,
+        D,D,D,D,D,D,Y,Y,Y,Y,D,D,D,D,D,D,
+        D,D,D,D,D,D,Y,Y,Y,Y,D,D,D,D,D,D,
+        D,D,D,D,D,D,Y,Y,Y,Y,D,D,D,D,D,D
     }
 };
 
-const uint16_t MAX_FRAME = sizeof(frames) / NUM_OF_PIXELS;
+const uint16_t MAX_FRAME = ((sizeof(frames) / sizeof(COLOR)) / NUM_OF_PIXELS);
 
 
 void setup() {
@@ -93,7 +100,7 @@ void setup() {
     strip.setBrightness(1);
     strip.show(); // Initialize all pixels to 'off'
 
-    Serial.print("Total number of frames: "); Serial.println(MAX_FRAME + 1);
+    Serial.print("Total number of frames: "); Serial.println(MAX_FRAME);
 }
 
 void loop() {
@@ -106,13 +113,16 @@ void loop() {
     delay(200);
 }
 
-void renderFrame( uint16_t frameNumber ) {
+void renderFrame( uint8_t frameNumber ) {
   // Ensure that there is a valid frame, otherwise we will walk off the memory allocated and then bad things happen
-  if (frameNumber >= 0 && frameNumber <= MAX_FRAME) {
+  if (frameNumber >= 0 && frameNumber < MAX_FRAME) {
 
+    COLOR pixel = {0, 0, 0};
+    
     // Setup every pixels
-    for(uint16_t i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, frames[frameNumber][i]);
+    for(uint8_t i = 0; i < strip.numPixels(); i++) {
+        pixel = frames[frameNumber][i];
+        strip.setPixelColor(i, pixel.r, pixel.g, pixel.b);
     }
 
     // Render the frame
@@ -120,8 +130,8 @@ void renderFrame( uint16_t frameNumber ) {
   }
 }
 
-uint16_t myRemoteRead() {
-    uint16_t remoteFrame = MAX_FRAME + 1; // Start off with an invalid frame to ease debugging
+uint8_t myRemoteRead() {
+    uint8_t remoteFrame = MAX_FRAME; // Start off with an invalid frame to ease debugging
     uint32_t remoteValue = 0;
     
     if (irrecv.decode(&results))  {  // have we received an IR signal?
