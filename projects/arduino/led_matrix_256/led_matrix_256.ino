@@ -16,8 +16,6 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_OF_PIXELS, MATRIX_DATA_PIN, NEO_
 //int sensorPin = A5;    // select the input pin for the potentiometer
 //int sensorValue = 0;  // variable to store the value coming from the sensor
 
-int j;
-uint32_t i;
 uint8_t d = 0;
 uint8_t b = pow(2,7);
 uint8_t g = pow(2,15);
@@ -97,6 +95,9 @@ void setup() {
     strip.setBrightness(1);
     strip.show(); // Initialize all pixels to 'off'
 
+
+    Serial.print("Total number of frames: "); Serial.println(MAX_FRAME + 1);
+
 }
 
 void loop() {
@@ -124,31 +125,36 @@ void renderFrame( uint16_t frameNumber ) {
 }
 
 uint16_t myRemoteRead() {
-    uint16_t remoteframe=3;
-    Serial.print("remoteframe=");
-    Serial.print(remoteframe);
-    Serial.println();
-    if (irrecv.decode(&results)) // have we received an IR signal?
-    {
-//switch(results.value){
-        if(results.value==0xA3C8EDDB) {
+    uint16_t remoteFrame = MAX_FRAME + 1; // Start off with an invalid frame to ease debugging
+    uint32_t remoteValue = 0;
+    
+    if (irrecv.decode(&results))  {  // have we received an IR signal?
+      remoteValue = results.value;
+      
+      switch(remoteValue) {
+        case 0xA3C8EDDB: // + button pressed
+          remoteFrame = 0;
+          break;
+  
+        case 0xE5CFBD7F: // - button pressed
+          remoteFrame = 1;
+          break;
+  
+        default: // Go here if none of the above buttons are pressed
+          remoteFrame = 2;
+          break;
+      }
 
-//case 0xA3C8EDDB: // + button pressed
-            remoteframe=1;  //set frame to 1 if remote control + button is pressed
-            return remoteframe;
-//break;
-        }
-
-        else if (results.value==0xE5CFBD7F) {
-//case 0xE5CFBD7F: // - button pressed
-            remoteframe=2;  //set frame to 1 if remote control + button is pressed
-            return remoteframe;
-//break;
-        }
-
-//frame=3; //set frame to default 3
-
+      irrecv.resume(); // Receive the next value
     }
-//irrecv.resume(); // receive the next value
-    return remoteframe;
+
+    Serial.print("remoteValue = ");
+    Serial.print(remoteValue);
+    Serial.println();
+    
+    Serial.print("remoteFrame = ");
+    Serial.print(remoteFrame);
+    Serial.println();
+    
+    return remoteFrame;
 }
