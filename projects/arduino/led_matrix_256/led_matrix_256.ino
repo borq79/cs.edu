@@ -16,18 +16,16 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_OF_PIXELS, MATRIX_DATA_PIN, NEO_
 //int sensorPin = A5;    // select the input pin for the potentiometer
 //int sensorValue = 0;  // variable to store the value coming from the sensor
 
-uint8_t d = 0;
-uint8_t b = pow(2,7);
-uint8_t g = pow(2,15);
-uint8_t r = pow(2,23);
-uint8_t p = b+r;
-uint8_t y = g+r;
-uint8_t a = b+g;
-uint8_t w = b+g+r;
+const uint8_t d = 0;
+const uint8_t b = pow(2,7);
+const uint8_t g = pow(2,15);
+const uint8_t r = pow(2,23);
+const uint8_t p = b+r;
+const uint8_t y = g+r;
+const uint8_t a = b+g;
+const uint8_t w = b+g+r;
 
-
-
-const uint8_t frames[][NUM_OF_PIXELS] = { {
+const PROGMEM uint8_t frames[][NUM_OF_PIXELS] = { {
         d,d,w,w,d,d,d,d,d,d,d,d,d,d,d,d,
         d,d,d,d,d,d,d,d,d,d,d,w,d,w,d,d,
         d,d,d,w,d,w,d,d,d,d,d,d,d,d,d,d,
