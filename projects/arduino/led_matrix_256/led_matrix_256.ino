@@ -4,14 +4,14 @@
 #include "IRremote.h"  //Remote control library
 #endif
 
-#define PIN 4
+#define NUM_OF_PIXELS    256
+#define MATRIX_DATA_PIN  4
+#define RECEIVER_PIN     12
 
-int receiver = 12; // Signal Pin of IR receiver to Arduino Digital Pin 12
-
-IRrecv irrecv(receiver);    // create instance of 'irrecv'
+IRrecv irrecv(RECEIVER_PIN);    // create instance of 'irrecv'
 decode_results results;     // create instance of 'decode_results'
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(256, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_OF_PIXELS, MATRIX_DATA_PIN, NEO_GRB + NEO_KHZ800);
 
 //int sensorPin = A5;    // select the input pin for the potentiometer
 //int sensorValue = 0;  // variable to store the value coming from the sensor
@@ -19,28 +19,21 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(256, PIN, NEO_GRB + NEO_KHZ800);
 int frame;
 int j;
 uint32_t i;
-uint32_t d=0;
-uint32_t b=pow(2,7);
-uint32_t g=pow(2,15);
-uint32_t r=pow(2,23);
-uint32_t p=b+r;
-uint32_t y=g+r;
-uint32_t a=b+g;
-uint32_t w=b+g+r;
+uint8_t d = 0;
+uint8_t b = pow(2,7);
+uint8_t g = pow(2,15);
+uint8_t r = pow(2,23);
+uint8_t p = b+r;
+uint8_t y = g+r;
+uint8_t a = b+g;
+uint8_t w = b+g+r;
 
 
 void setup() {
-    // This is for Trinket 5V 16MHz, you can remove these three lines if you are not using a Trinket
-#if defined (__AVR_ATtiny85__)
-    if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
-#endif
-    // End of trinket special code
-
     irrecv.enableIRIn(); // Start the remote control receiver
 
     Serial.begin(9600); // setup serial printing so you can troubleshoot
-    //Serial.print("i=");  //Print something to serial terminal for viewing
-    //Serial.print(i);
+    
     strip.begin();
     strip.show(); // Initialize all pixels to 'off'
 
@@ -73,7 +66,7 @@ void rainbowCycle(uint8_t wait) {
 //Frame 1
     if (frame==1) {
 
-        uint32_t myMatrixRow1[256] = {d,d,w,w,d,d,d,d,d,d,d,d,d,d,d,d,
+        uint8_t myMatrixRow1[256]  = {d,d,w,w,d,d,d,d,d,d,d,d,d,d,d,d,
                                       d,d,d,d,d,d,d,d,d,d,d,w,d,w,d,d,
                                       d,d,d,w,d,w,d,d,d,d,d,d,d,d,d,d,
                                       d,d,d,d,d,d,d,d,d,w,d,d,d,d,d,d,
@@ -104,7 +97,7 @@ void rainbowCycle(uint8_t wait) {
 //Frame 2
     else if (frame==2) {
 
-        uint32_t myMatrixRow2[256] = {d,d,d,d,d,d,d,d,r,d,d,d,d,d,d,d,
+        uint8_t myMatrixRow2[256] = {d,d,d,d,d,d,d,d,r,d,d,d,d,d,d,d,
                                       d,d,d,d,d,d,d,r,d,d,d,d,d,d,d,d,
                                       d,d,d,d,d,d,d,r,w,r,d,d,d,d,d,d,
                                       d,d,d,d,d,r,r,w,r,r,d,d,d,d,d,d,
@@ -135,7 +128,7 @@ void rainbowCycle(uint8_t wait) {
 //Frame 3
     else if (frame==3) {
 
-        uint32_t myMatrixRow3[256] = {d,d,d,d,d,d,d,g,g,d,d,d,d,d,d,d,
+        uint8_t myMatrixRow3[256] = {d,d,d,d,d,d,d,g,g,d,d,d,d,d,d,d,
                                       d,d,d,d,d,d,d,g,g,d,d,d,d,d,d,d,
                                       d,d,d,d,d,d,b,g,g,g,d,d,d,d,d,d,
                                       d,d,d,d,d,d,g,g,b,r,d,d,d,d,d,d,
