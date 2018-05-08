@@ -64,6 +64,7 @@ void setup()
   pinMode(dataIn, OUTPUT);
   pinMode(clock, OUTPUT);
   pinMode(load, OUTPUT);
+  pinMode(A0, INPUT);
 
   maxAll(max7219_reg_scanLimit, 0x07);
   maxAll(max7219_reg_decodeMode, 0x00);
