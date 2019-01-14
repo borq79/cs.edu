@@ -11,6 +11,7 @@
 #define TRIGGER_PIN  6  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     7  // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters).
+#define DOOR_WIDTH   71  // Door Width in centimeters (28" Door)
 
 #define ALARM 3
 float sinVal;
@@ -36,7 +37,7 @@ void setup(){
 void loop(){
   Serial.print("Alarm delay: "); Serial.println(alarmDuration);
   if(triggered == true && alarmDuration < MAX_ALARM_TIME) {
-    alarmDuration += 250;
+    alarmDuration += 600;
     alarm();
   } else if(triggered == true) {
     alarmDuration = 0;
@@ -47,7 +48,7 @@ void loop(){
     unsigned int uS = sonar.ping();             // Send ping, get ping time in microseconds (uS).
     unsigned int distance = uS / US_ROUNDTRIP_CM;
     Serial.println(distance);
-    if(distance < 70) {
+    if(distance < DOOR_WIDTH && distance > 0) {
       triggered = true;
     }
   } 
@@ -55,17 +56,17 @@ void loop(){
 
 void alarm(){
   color(225,0,178);    //red
-  delay(200);
+  delay(100);
   color(0,199,225);  //yelow
-  delay(200);
+  delay(100);
   color(4,225,0);
-  delay(200);
+  delay(100);
   color(109,57,1);
-  delay(400);
+  delay(100);
   color(8,0,225);
-  delay(200);
+  delay(100);
   color(242,225,0);
-  delay(300);
+  delay(100);
   for (int x=0; x<180; x++) {
     // convert degrees to radians then obtain sin value
     sinVal = (sin(x*(3.1412/180)));
