@@ -2,11 +2,22 @@
 #include <NewTone.h>
 #include <Adafruit_NeoPixel.h>
 #include <NewPing.h>
+#include "Adafruit_GFX.h"
+#include "Adafruit_SSD1306.h"
+
+#if (SSD1306_LCDHEIGHT != 64)
+#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
+
+Adafruit_SSD1306 *display;
+void showDistanceOnDisplay(unsigned int distance);
+void showAlertOnDisplay();
+void initDisplay();
 
 // LED Light Strand Pin
 #define LED_PIN      2
 
-#define MAX_ALARM_TIME 10000
+#define MAX_ALARM_TIME 5000
 
 #define TRIGGER_PIN  6  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     7  // Arduino pin tied to echo pin on the ultrasonic sensor.
@@ -30,7 +41,18 @@ void setup(){
   strip.begin();
   strip.show();       // Initialize all pixels to 'off'
 
-  delay(5000);
+  initDisplay();
+  display->clearDisplay();
+  display->setTextSize(2);
+  display->setTextColor(WHITE);
+  display->setCursor(15,0);
+  display->println("Distance");
+  display->setCursor(15, 30);
+  display->setTextSize(1);
+  display->println("Initializing ...");
+  display->display();
+
+  delay(1000);
 }
 
 
@@ -48,10 +70,38 @@ void loop(){
     unsigned int uS = sonar.ping();             // Send ping, get ping time in microseconds (uS).
     unsigned int distance = uS / US_ROUNDTRIP_CM;
     Serial.println(distance);
+    
     if(distance < DOOR_WIDTH && distance > 0) {
       triggered = true;
+      showAlertOnDisplay();
+    } else {
+      showDistanceOnDisplay(distance);
     }
   } 
+}
+
+void showDistanceOnDisplay(unsigned int distance) {
+  display->clearDisplay();
+  display->setTextSize(2);
+  display->setCursor(15,0);
+  display->println("Distance");
+  display->setCursor(15, 30);
+  display->setTextSize(3);
+  display->print(distance); 
+  display->setTextSize(2);
+  display->println(" cm");
+  display->display(); 
+}
+
+void showAlertOnDisplay() {
+  display->clearDisplay();
+  display->setTextSize(2);
+  display->setCursor(20,0);
+  display->println("ALERT!");
+  display->setCursor(10, 30);
+  display->setTextSize(2);
+  display->println("Intruder!");
+  display->display(); 
 }
 
 void alarm(){
@@ -88,4 +138,19 @@ void color (unsigned char red, unsigned char green, unsigned char blue)     // t
     strip.setPixelColor(i, red, green, blue);
   }
   strip.show();
+}
+
+
+void initDisplay() {
+  delay(200);
+
+  display = new Adafruit_SSD1306(4);
+
+   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
+  display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
+  // init done
+
+  display->display(); // show splashscreen
+  delay(1500);
+  display->clearDisplay();   // clears the screen and buffer
 }
