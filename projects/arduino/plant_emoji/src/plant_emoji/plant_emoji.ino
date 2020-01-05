@@ -1,10 +1,15 @@
 //Put the following code into arduino
+#include <NewTone.h>
 
 long soilhumid;
 long humid;
 int dataIn = 2;
 int load = 3;
 int clock = 4;
+#define ALARM 6
+float sinVal;
+int toneVal;
+int alarmDuration = 0;
 
 byte max7219_reg_noop = 0x00;
 byte max7219_reg_digit0 = 0x01;
@@ -58,6 +63,21 @@ void maxSingle(byte reg, byte col) {
   digitalWrite(load,HIGH);
 }
 
+void alarm(){
+  for (int x=0; x<180; x++) {
+    // convert degrees to radians then obtain sin value
+    sinVal = (sin(x*(3.1412/180)));
+    // generate a frequency from the sin value
+    toneVal = 2000+(int(sinVal*1000));
+    NewTone(ALARM, toneVal);
+  }
+}
+
+void alarmOff() {
+  NewTone(ALARM, 0);
+}
+
+
 void setup()
 {
   Serial.begin(9600);
@@ -73,10 +93,11 @@ void setup()
 
   for (e=1; e<=8; e++) { maxAll(e,0); }
   maxAll(max7219_reg_intensity, 0x0f & 0x0f);
-  pinMode(0, OUTPUT);
+  pinMode(ALARM, OUTPUT);
+
 
   soilhumid = 0;
-  humid = 300
+  humid = 500
   ;
 }
 
@@ -91,8 +112,9 @@ void loop()
   if (soilhumid > humid) {
 
     // sad face
-    maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,60); maxSingle(6,66); maxSingle(7,66); maxSingle(8,0);// buzzer on
-    digitalWrite(0,HIGH);
+    maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,60); maxSingle(6,66); maxSingle(7,66); maxSingle(8,0);
+    // buzzer on
+    alarm();
 //    delay(3000);
 
     // buzzer off
@@ -101,7 +123,7 @@ void loop()
 
     // happy face
     maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,126); maxSingle(6,66); maxSingle(7,36); maxSingle(8,24);// buzzer off
-    digitalWrite(0,LOW);
+    alarmOff();
   }
     delay(1000);
 }
