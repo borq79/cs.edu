@@ -6,10 +6,14 @@ long humid;
 int dataIn = 2;
 int load = 3;
 int clock = 4;
+
 #define ALARM 6
 float sinVal;
 int toneVal;
 int alarmDuration = 0;
+bool triggerAlarm = true;
+
+#define MAX_ALARM_DURATION 10000
 
 byte max7219_reg_noop = 0x00;
 byte max7219_reg_digit0 = 0x01;
@@ -94,11 +98,8 @@ void setup()
   for (e=1; e<=8; e++) { maxAll(e,0); }
   maxAll(max7219_reg_intensity, 0x0f & 0x0f);
   pinMode(ALARM, OUTPUT);
-
-
   soilhumid = 0;
-  humid = 500
-  ;
+  humid = 500;
 }
 
 void loop()
@@ -114,16 +115,27 @@ void loop()
     // sad face
     maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,60); maxSingle(6,66); maxSingle(7,66); maxSingle(8,0);
     // buzzer on
-    alarm();
-//    delay(3000);
 
-    // buzzer off
-    digitalWrite(0,LOW);
+    if (triggerAlarm) {
+      alarm();
+      alarmDuration += 1000;
+    }
+    
+
   } else {
 
     // happy face
     maxSingle(1,0); maxSingle(2,102); maxSingle(3,102); maxSingle(4,0); maxSingle(5,126); maxSingle(6,66); maxSingle(7,36); maxSingle(8,24);// buzzer off
     alarmOff();
+    alarmDuration = 0;
+    triggerAlarm = true;
   }
-    delay(1000);
+  
+  delay(1000);
+
+  if (alarmDuration >= MAX_ALARM_DURATION) {
+    alarmOff();
+    alarmDuration = 0;
+    triggerAlarm = false;
+  }
 }
