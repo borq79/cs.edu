@@ -4,6 +4,10 @@
 #include <NewPing.h>
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
+#include "alarm.h"
+
+// change to false to use the more traditional alarm
+#define USE_MUSIC_INSTEAD_OF_ALARM true
 
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
@@ -14,17 +18,6 @@ void showDistanceOnDisplay(unsigned int distance);
 void showAlertOnDisplay();
 void initDisplay();
 
-// LED Light Strand Pin
-#define LED_PIN      2
-
-#define MAX_ALARM_TIME 5000
-
-#define TRIGGER_PIN  6  // Arduino pin tied to trigger pin on the ultrasonic sensor.
-#define ECHO_PIN     7  // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters).
-#define DOOR_WIDTH   71  // Door Width in centimeters (28" Door)
-
-#define ALARM 3
 float sinVal;
 int toneVal;
 int alarmDuration = 0;
@@ -58,10 +51,10 @@ void setup(){
 
 void loop(){
   Serial.print("Alarm delay: "); Serial.println(alarmDuration);
-  if(triggered == true && alarmDuration < MAX_ALARM_TIME) {
+  if(USE_MUSIC_INSTEAD_OF_ALARM == false && (triggered == true && alarmDuration < MAX_ALARM_TIME)) {
     alarmDuration += 600;
     alarm();
-  } else if(triggered == true) {
+  } else if(USE_MUSIC_INSTEAD_OF_ALARM == false && triggered == true) {
     alarmDuration = 0;
     triggered = false;
     alarmOff();
@@ -74,6 +67,10 @@ void loop(){
     if(distance < DOOR_WIDTH && distance > 0) {
       triggered = true;
       showAlertOnDisplay();
+
+      if (USE_MUSIC_INSTEAD_OF_ALARM) {
+        playMusic(death);
+      }
     } else {
       showDistanceOnDisplay(distance);
     }
@@ -153,4 +150,22 @@ void initDisplay() {
   display->display(); // show splashscreen
   delay(1500);
   display->clearDisplay();   // clears the screen and buffer
+}
+
+// Borrowed these note arrays from https://github.com/tsukisan/Arduino/tree/master/WiiClassicSoundboard
+void playMusic(const int *song) {
+  if (song != NULL) {
+    int numberOfNotes = song[0];
+    
+    for(int i = 1; i < (numberOfNotes * 2); i += 2) {
+      int note =  song[i];
+      int duration = song[i + 1];
+
+      int durationMs = 1000 / duration;
+      
+      tone(ALARM, note, durationMs);
+      delay(durationMs * 1.30);
+      noTone(ALARM); 
+    }
+  }
 }
