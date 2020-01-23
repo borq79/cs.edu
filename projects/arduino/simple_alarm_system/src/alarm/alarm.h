@@ -1,11 +1,30 @@
 #define MAX_ALARM_TIME      5000
-#define ALARM               6
+#define ALARM               3
 #define TRIGGER_PIN  6  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     7  // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters).
+#define MAX_DISTANCE 400 // Maximum distance we want to ping for (in centimeters).
 #define DOOR_WIDTH   71  // Door Width in centimeters (28" Door)
 // LED Light Strand Pin
 #define LED_PIN      2
+#define NUM_OF_PIXELS 10
+#define ALARM_SETUP_TIME_WINDOW 15000
+
+struct COLOR {
+  byte r;
+  byte g;
+  byte b;
+};
+
+#define RED    {0x7F, 0x00, 0x00} 
+#define GREEN  {0x00, 0x7F, 0x00}
+#define BLUE   {0x00, 0x00, 0x7F}
+#define PURPLE {0x7F, 0x00, 0x7F}
+#define ORANGE {0x7F, 0x52, 0x00}
+#define WHITE  {0x7F, 0x7F, 0x7F}
+#define YELLOW {0x79, 0x7A, 0x05}
+#define INDIGO {0x20, 0x05, 0x7A}
+
+#define NUM_OF_COLORS 8
 
 #define NOTE_H   0
 #define NOTE_B0  31
@@ -98,19 +117,19 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 
-/*
+
 // Borrowed these note arrays from https://github.com/tsukisan/Arduino/tree/master/WiiClassicSoundboard
-const int theme[] = {11,                                                  // Array for Theme song
+const uint16_t theme[] = {11,                                                  // Array for Theme song
   NOTE_E4, 8, NOTE_E4, 8, NOTE_H, 8, NOTE_E4, 8, NOTE_H, 8, NOTE_C4, 8, NOTE_E4, 8, NOTE_H, 8, NOTE_G4, 8, NOTE_H, 3, NOTE_G3, 8};
-const int life[] = {6,                                                    // Array for 1-up sound effect
+const uint16_t life[] = {6,                                                    // Array for 1-up sound effect
   NOTE_E5, 10, NOTE_G5, 10, NOTE_E6, 10, NOTE_C6, 10, NOTE_D6, 10, NOTE_G6, 10};
-const int flagpole[] = {27,                                               // Array for Flag pole sound effect & song
+const uint16_t flagpole[] = {27,                                               // Array for Flag pole sound effect & song
   NOTE_G2, 10, NOTE_C3, 10, NOTE_E3, 10, NOTE_G3, 10, NOTE_C4, 10, NOTE_E4, 10, NOTE_G4, 3, NOTE_E4, 3, NOTE_GS2, 10, NOTE_C3, 10, 
   NOTE_DS3, 10, NOTE_GS3, 10, NOTE_C4, 10, NOTE_DS4, 10, NOTE_GS4, 3, NOTE_DS4, 3, NOTE_AS2, 10, NOTE_D3, 10, NOTE_F3, 10, 
-  NOTE_AS3, 10, NOTE_D4, 10, NOTE_F4, 10, NOTE_AS4, 3, NOTE_B4, 10, NOTE_B4, 10, NOTE_B4, 10, NOTE_C5, 2};*/
-const int death[] = {17,                                                  // Array for Death sound effect & song
+  NOTE_AS3, 10, NOTE_D4, 10, NOTE_F4, 10, NOTE_AS4, 3, NOTE_B4, 10, NOTE_B4, 10, NOTE_B4, 10, NOTE_C5, 2};
+const uint16_t death[] = {17,                                                  // Array for Death sound effect & song
   NOTE_C4, 32, NOTE_CS4, 32, NOTE_D4, 16, NOTE_H, 4, NOTE_H, 2, NOTE_B3, 8, NOTE_F4, 8, NOTE_H, 8, NOTE_F4, 8, NOTE_F4, 6, 
   NOTE_E4, 6, NOTE_D4, 6, NOTE_C4, 8, NOTE_E3, 8, NOTE_H, 8, NOTE_E3, 8, NOTE_C3, 8};
-const int gameover[] = {15,                                               // Array for Game over song
+const uint16_t gameover[] = {15,                                               // Array for Game over song
   NOTE_C4, 8, NOTE_H, 8, NOTE_H, 8, NOTE_G3, 8, NOTE_H, 4, NOTE_E3, 4, NOTE_A3, 6, NOTE_B3, 6, NOTE_A3, 6, NOTE_GS3, 6, NOTE_AS3, 6, 
   NOTE_GS3, 6, NOTE_G3, 8, NOTE_F3, 8, NOTE_G3, 4};
